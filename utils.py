@@ -27,8 +27,8 @@ def prepare_json(imginfo: dict, imgpath):
     json_for_i2i["parameters"]["scale"] = img_comment["scale"]
     json_for_i2i["parameters"]["sampler"] = img_comment["sampler"]
     json_for_i2i["parameters"]["steps"] = img_comment["steps"]
-    json_for_i2i["parameters"]["strength"] = env.hires_strength
-    json_for_i2i["parameters"]["noise"] = env.hires_noise
+    json_for_i2i["parameters"]["strength"] = 0.2
+    json_for_i2i["parameters"]["noise"] = 0
     json_for_i2i["parameters"]["sm"] = img_comment["sm"]
     json_for_i2i["parameters"]["sm_dyn"] = img_comment["sm_dyn"]
     json_for_i2i["parameters"]["noise_schedule"] = img_comment["noise_schedule"]

@@ -11,7 +11,7 @@ def plugin():
         with gr.Row():
             with gr.Column(scale=6):
                 gr.Markdown(
-                    "> NovelAI 的 Enhance 功能, 本质就是图生图, 甚至重绘幅度是固定的 0.5"
+                    "> NovelAI 的 Enhance 功能, 本质就是图生图, 甚至重绘幅度是固定的 0.2"
                 )
             with gr.Row():
                 folder = gr.Textbox(Path("./output/enhance"), visible=False)
