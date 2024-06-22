@@ -1,3 +1,4 @@
+import random
 from pathlib import Path
 
 import ujson as json
@@ -21,6 +22,7 @@ def prepare_json(imginfo: dict, imgpath):
         logger.error("不是 NovelAI 生成的图片!")
         return
     img_comment = json.loads(imginfo["Comment"])
+    seed = random.randint(1000000000, 9999999999)
     json_for_i2i["input"] = img_comment["prompt"]
     json_for_i2i["parameters"]["width"] = img_comment["width"]
     json_for_i2i["parameters"]["height"] = img_comment["height"]
@@ -32,9 +34,9 @@ def prepare_json(imginfo: dict, imgpath):
     json_for_i2i["parameters"]["sm"] = img_comment["sm"]
     json_for_i2i["parameters"]["sm_dyn"] = img_comment["sm_dyn"]
     json_for_i2i["parameters"]["noise_schedule"] = img_comment["noise_schedule"]
-    json_for_i2i["parameters"]["seed"] = img_comment["seed"]
+    json_for_i2i["parameters"]["seed"] = seed
     json_for_i2i["parameters"]["image"] = img_to_base64(imgpath)
-    json_for_i2i["parameters"]["extra_noise_seed"] = img_comment["seed"]
+    json_for_i2i["parameters"]["extra_noise_seed"] = seed
     json_for_i2i["parameters"]["negative_prompt"] = img_comment["uc"]
 
     return json_for_i2i, json_for_i2i["parameters"]["seed"]
