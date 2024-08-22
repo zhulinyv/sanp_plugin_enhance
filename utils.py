@@ -2,13 +2,13 @@ import random
 from pathlib import Path
 
 import ujson as json
-from loguru import logger
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
 
 from utils.env import env
 from utils.imgtools import get_img_info, img_to_base64
 from utils.jsondata import json_for_i2i
+from utils.prepare import logger
 from utils.utils import (
     file_path2list,
     generate_image,
