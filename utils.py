@@ -33,6 +33,14 @@ def prepare_json(imginfo: dict, imgpath):
     json_for_i2i["parameters"]["noise"] = 0
     json_for_i2i["parameters"]["sm"] = img_comment["sm"]
     json_for_i2i["parameters"]["sm_dyn"] = img_comment["sm_dyn"]
+    try:
+        skip_cfg_above_sigma = img_comment["skip_cfg_above_sigma"]
+    except KeyError:
+        skip_cfg_above_sigma = None
+    json_for_i2i["parameters"]["skip_cfg_above_sigma"] = skip_cfg_above_sigma
+    json_for_i2i["parameters"]["dynamic_thresholding"] = img_comment[
+        "dynamic_thresholding"
+    ]
     json_for_i2i["parameters"]["noise_schedule"] = img_comment["noise_schedule"]
     json_for_i2i["parameters"]["seed"] = seed
     json_for_i2i["parameters"]["image"] = img_to_base64(imgpath)
