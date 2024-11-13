@@ -29,8 +29,8 @@ def prepare_json(imginfo: dict, imgpath):
     json_for_i2i["parameters"]["steps"] = img_comment["steps"]
     json_for_i2i["parameters"]["strength"] = 0.2
     json_for_i2i["parameters"]["noise"] = 0
-    json_for_i2i["parameters"]["sm"] = img_comment["sm"]
-    json_for_i2i["parameters"]["sm_dyn"] = img_comment["sm_dyn"]
+    json_for_i2i["parameters"]["sm"] = False
+    json_for_i2i["parameters"]["sm_dyn"] = False
     try:
         skip_cfg_above_sigma = img_comment["skip_cfg_above_sigma"]
     except KeyError:
@@ -65,11 +65,11 @@ def main(input_image: str, input_path, batch):
                 img_path = i2i_path / img
                 json_data, seed = prepare_json(get_img_info(img_path), img_path)
 
-                if batch:
+                try:
                     seed = info_list[0]
                     choose_game = info_list[1]
                     choose_character = info_list[2]
-                else:
+                except Exception:
                     seed = seed
                     choose_game = "None"
                     choose_character = "None"
