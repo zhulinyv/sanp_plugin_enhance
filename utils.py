@@ -6,7 +6,7 @@ from PIL import Image
 from PIL.PngImagePlugin import PngInfo
 
 from utils.env import env
-from utils.imgtools import get_img_info, img_to_base64
+from utils.imgtools import get_img_info, img_to_base64, return_pnginfo
 from utils.jsondata import json_for_i2i
 from utils.prepare import logger
 from utils.utils import (
@@ -21,7 +21,7 @@ def prepare_json(imginfo: dict, imgpath):
     if imginfo["Software"] != "NovelAI":
         logger.error("不是 NovelAI 生成的图片!")
         return
-    img_comment = json.loads(imginfo["Comment"])
+    img_comment = imginfo["Comment"]
     seed = random.randint(1000000000, 9999999999)
     json_for_i2i["input"] = img_comment["prompt"]
     json_for_i2i["parameters"]["width"] = img_comment["width"]
@@ -55,12 +55,12 @@ def main(input_image: Image.Image, input_path, batch):
         i2i_path = Path(input_path)
         img_list = file_path2list(i2i_path)
     else:
-        info = input_image.info
+        info = json.loads(return_pnginfo(input_image)[-1])
         software = info["Software"]
         comment = info["Comment"]
         metadata = PngInfo()
         metadata.add_text("Software", software)
-        metadata.add_text("Comment", comment)
+        metadata.add_text("Comment", str(comment))
 
         input_image.save("./output/temp.png", pnginfo=metadata)
         i2i_path = Path("./output")
@@ -102,4 +102,5 @@ def main(input_image: Image.Image, input_path, batch):
                 times += 1
                 logger.error(f"出现错误: {e}")
                 logger.warning(f"重试 {times-1}/5...")
+
     return "Enhance 完成!", saved_path
