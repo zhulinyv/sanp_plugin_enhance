@@ -20,7 +20,7 @@ def plugin():
         with gr.Row():
             with gr.Column():
                 enhance_button = gr.Button("开始 Enhance")
-                input_image = gr.Image(label="要 Enhance 的图片", type="pil")
+                input_image = gr.Image(label="要 Enhance 的图片", type="filepath")
                 with gr.Row():
                     input_path = gr.Textbox(value=None, label="批处理路径", scale=3)
                     batch = gr.Checkbox(value=False, label="是否启用批处理")

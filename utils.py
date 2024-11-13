@@ -1,16 +1,14 @@
 import random
 from pathlib import Path
 
-import ujson as json
-from PIL import Image
-from PIL.PngImagePlugin import PngInfo
-
 from utils.env import env
-from utils.imgtools import get_img_info, img_to_base64, return_pnginfo
+from utils.imgtools import get_img_info, img_to_base64
 from utils.jsondata import json_for_i2i
 from utils.prepare import logger
 from utils.utils import (
+    file_path2dir,
     file_path2list,
+    file_path2name,
     generate_image,
     save_image,
     sleep_for_cool,
@@ -50,28 +48,20 @@ def prepare_json(imginfo: dict, imgpath):
     return json_for_i2i, json_for_i2i["parameters"]["seed"]
 
 
-def main(input_image: Image.Image, input_path, batch):
+def main(input_image: str, input_path, batch):
     if batch:
         i2i_path = Path(input_path)
         img_list = file_path2list(i2i_path)
     else:
-        info = json.loads(return_pnginfo(input_image)[-1])
-        software = info["Software"]
-        comment = info["Comment"]
-        metadata = PngInfo()
-        metadata.add_text("Software", software)
-        metadata.add_text("Comment", str(comment))
-
-        input_image.save("./output/temp.png", pnginfo=metadata)
-        i2i_path = Path("./output")
-        img_list = ["temp.png"]
+        i2i_path = Path(file_path2dir(input_image))
+        img_list = [file_path2name(input_image)]
 
     for img in img_list:
         times = 1
         while times <= 5:
             try:
                 logger.info(f"正在 Enhance: {img}...")
-                info_list = img.replace(".png", "").split("_")
+                info_list = img.replace(".png", "").replace(".jpg", "").split("_")
                 img_path = i2i_path / img
                 json_data, seed = prepare_json(get_img_info(img_path), img_path)
 
