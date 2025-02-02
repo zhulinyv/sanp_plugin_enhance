@@ -37,15 +37,15 @@ def prepare_json(imginfo: dict, imgpath):
     if env.model != "nai-diffusion-4-curated-preview":
         json_for_i2i["parameters"]["sm"] = False
         json_for_i2i["parameters"]["sm_dyn"] = False
-        try:
-            variety = img_comment["skip_cfg_above_sigma"]
-        except KeyError:
-            logger.warning(
-                "旧版图片不支持 variety 参数, 将使用配置设置中的 variety 参数"
-            )
-            variety = env.variety
-            json_for_i2i["parameters"]["skip_cfg_above_sigma"] = 19 if variety else None
-    json_for_i2i["parameters"]["dynamic_thresholding"] = env.decrisp
+    try:
+        variety = img_comment["skip_cfg_above_sigma"]
+    except KeyError:
+        logger.warning("旧版图片不支持 variety 参数, 将使用配置设置中的 variety 参数")
+        variety = env.variety
+    json_for_i2i["parameters"]["skip_cfg_above_sigma"] = 19 if variety else None
+    json_for_i2i["parameters"]["dynamic_thresholding"] = img_comment[
+        "dynamic_thresholding"
+    ]
     try:
         json_for_i2i["parameters"]["noise_schedule"] = img_comment["noise_schedule"]
     except KeyError:
