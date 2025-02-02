@@ -3,7 +3,12 @@ from pathlib import Path
 
 from utils.env import env
 from utils.imgtools import get_img_info, img_to_base64
-from utils.jsondata import json_for_i2i
+
+if env.model != "nai-diffusion-4-curated-preview":
+    from utils.jsondata import json_for_i2i
+else:
+    from utils.jsondata import json_for_i2i_v4 as json_for_i2i
+
 from utils.prepare import logger
 from utils.utils import (
     file_path2dir,
@@ -30,16 +35,16 @@ def prepare_json(imginfo: dict, imgpath):
     json_for_i2i["parameters"]["strength"] = 0.2
     json_for_i2i["parameters"]["noise"] = 0
     if env.model != "nai-diffusion-4-curated-preview":
+        json_for_i2i["parameters"]["sm"] = False
+        json_for_i2i["parameters"]["sm_dyn"] = False
         try:
-            json_for_i2i["parameters"]["sm"] = False
-            json_for_i2i["parameters"]["sm_dyn"] = False
-            try:
-                variety = img_comment["skip_cfg_above_sigma"]
-            except KeyError:
-                variety = env.variety
-            json_for_i2i["parameters"]["skip_cfg_above_sigma"] = 19 if variety else None
+            variety = img_comment["skip_cfg_above_sigma"]
         except KeyError:
-            logger.warning("NAI4 暂不支持 sm, sm_dyn 等参数")
+            logger.warning(
+                "旧版图片不支持 variety 参数, 将使用配置设置中的 variety 参数"
+            )
+            variety = env.variety
+            json_for_i2i["parameters"]["skip_cfg_above_sigma"] = 19 if variety else None
     json_for_i2i["parameters"]["dynamic_thresholding"] = env.decrisp
     try:
         json_for_i2i["parameters"]["noise_schedule"] = img_comment["noise_schedule"]
