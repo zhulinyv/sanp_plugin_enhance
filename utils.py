@@ -29,21 +29,66 @@ def prepare_json(imginfo: dict, imgpath):
     json_for_i2i["parameters"]["steps"] = img_comment["steps"]
     json_for_i2i["parameters"]["strength"] = 0.2
     json_for_i2i["parameters"]["noise"] = 0
-    json_for_i2i["parameters"]["sm"] = False
-    json_for_i2i["parameters"]["sm_dyn"] = False
+    if env.model != "nai-diffusion-4-curated-preview":
+        try:
+            json_for_i2i["parameters"]["sm"] = False
+            json_for_i2i["parameters"]["sm_dyn"] = False
+            try:
+                variety = img_comment["skip_cfg_above_sigma"]
+            except KeyError:
+                variety = env.variety
+            json_for_i2i["parameters"]["skip_cfg_above_sigma"] = 19 if variety else None
+        except KeyError:
+            logger.warning("NAI4 暂不支持 sm, sm_dyn 等参数")
+    json_for_i2i["parameters"]["dynamic_thresholding"] = env.decrisp
     try:
-        skip_cfg_above_sigma = img_comment["skip_cfg_above_sigma"]
+        json_for_i2i["parameters"]["noise_schedule"] = img_comment["noise_schedule"]
     except KeyError:
-        skip_cfg_above_sigma = None
-    json_for_i2i["parameters"]["skip_cfg_above_sigma"] = skip_cfg_above_sigma
-    json_for_i2i["parameters"]["dynamic_thresholding"] = img_comment[
-        "dynamic_thresholding"
-    ]
-    json_for_i2i["parameters"]["noise_schedule"] = img_comment["noise_schedule"]
+        pass
     json_for_i2i["parameters"]["seed"] = seed
     json_for_i2i["parameters"]["image"] = img_to_base64(imgpath)
     json_for_i2i["parameters"]["extra_noise_seed"] = seed
     json_for_i2i["parameters"]["negative_prompt"] = img_comment["uc"]
+
+    if env.model == "nai-diffusion-4-curated-preview":
+        try:
+            json_for_i2i["parameters"]["use_coords"] = img_comment["v4_prompt"][
+                "use_coords"
+            ]
+            json_for_i2i["parameters"]["v4_prompt"]["caption"]["base_caption"] = (
+                img_comment["v4_prompt"]["caption"]["base_caption"]
+            )
+            json_for_i2i["parameters"]["v4_prompt"]["use_coords"] = img_comment[
+                "v4_prompt"
+            ]["use_coords"]
+            json_for_i2i["parameters"]["v4_negative_prompt"]["caption"][
+                "base_caption"
+            ] = img_comment["uc"]
+
+            num = 0
+            for char_captions in img_comment["v4_prompt"]["caption"]["char_captions"]:
+                json_for_i2i["parameters"]["characterPrompts"] = []
+                json_for_i2i["parameters"]["characterPrompts"].append(
+                    {
+                        "prompt": char_captions["char_caption"],
+                        "uc": img_comment["v4_negative_prompt"]["caption"][
+                            "char_captions"
+                        ][num]["char_caption"],
+                        "center": {
+                            "x": char_captions["centers"][0]["x"],
+                            "y": char_captions["centers"][0]["y"],
+                        },
+                    }
+                )
+                num += 1
+        except KeyError:
+            logger.warning("正在使用 NAI3 生成的图片使用 NAI4 图生图!")
+            json_for_i2i["parameters"]["use_coords"] = False
+            json_for_i2i["parameters"]["v4_prompt"]["caption"]["base_caption"] = ""
+            json_for_i2i["parameters"]["v4_prompt"]["use_coords"] = False
+            json_for_i2i["parameters"]["v4_negative_prompt"]["caption"][
+                "base_caption"
+            ] = ""
 
     return json_for_i2i, json_for_i2i["parameters"]["seed"]
 
