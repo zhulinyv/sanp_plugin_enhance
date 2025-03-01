@@ -4,7 +4,7 @@ from pathlib import Path
 from utils.env import env
 from utils.imgtools import get_img_info, img_to_base64
 
-if env.model != "nai-diffusion-4-curated-preview":
+if "nai-diffusion-4" not in env.model:
     from utils.jsondata import json_for_i2i
 else:
     from utils.jsondata import json_for_i2i_v4 as json_for_i2i
@@ -34,7 +34,7 @@ def prepare_json(imginfo: dict, imgpath):
     json_for_i2i["parameters"]["steps"] = img_comment["steps"]
     json_for_i2i["parameters"]["strength"] = 0.2
     json_for_i2i["parameters"]["noise"] = 0
-    if env.model != "nai-diffusion-4-curated-preview":
+    if "nai-diffusion-4" not in env.model:
         json_for_i2i["parameters"]["sm"] = False
         json_for_i2i["parameters"]["sm_dyn"] = False
     try:
@@ -55,7 +55,7 @@ def prepare_json(imginfo: dict, imgpath):
     json_for_i2i["parameters"]["extra_noise_seed"] = seed
     json_for_i2i["parameters"]["negative_prompt"] = img_comment["uc"]
 
-    if env.model == "nai-diffusion-4-curated-preview":
+    if "nai-diffusion-4" in env.model:
         try:
             json_for_i2i["parameters"]["use_coords"] = img_comment["v4_prompt"][
                 "use_coords"
