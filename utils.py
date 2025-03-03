@@ -30,6 +30,7 @@ def prepare_json(imginfo: dict, imgpath):
     json_for_i2i["parameters"]["width"] = img_comment["width"]
     json_for_i2i["parameters"]["height"] = img_comment["height"]
     json_for_i2i["parameters"]["scale"] = img_comment["scale"]
+    json_for_i2i["parameters"]["cfg_rescale"] = img_comment["cfg_rescale"]
     json_for_i2i["parameters"]["sampler"] = img_comment["sampler"]
     json_for_i2i["parameters"]["steps"] = img_comment["steps"]
     json_for_i2i["parameters"]["strength"] = 0.2
